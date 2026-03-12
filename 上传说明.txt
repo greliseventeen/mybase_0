@@ -1,0 +1,22 @@
+
+DELL@LAPTOP-T8P6M50A MINGW64 /e/Git仓库/mybase_0 (main)
+$ git add test.txt
+
+DELL@LAPTOP-T8P6M50A MINGW64 /e/Git仓库/mybase_0 (main)
+$ git commit -m "测试是否成功"
+[main (root-commit) 74337f1] 测试是否成功
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 test.txt
+
+DELL@LAPTOP-T8P6M50A MINGW64 /e/Git仓库/mybase_0 (main)
+$ git push origin main
+Enumerating objects: 3, done.
+Counting objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 229 bytes | 229.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To github.com:greliseventeen/mybase_0.git
+ * [new branch]      main -> main
+
+DELL@LAPTOP-T8P6M50A MINGW64 /e/Git仓库/mybase_0 (main)
+$
+

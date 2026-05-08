@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="content_categories">
+        <item>经济</item>
+        <item>民生</item>
+        <item>法治</item>
+        <item>生态</item>
+        <item>科技</item>
+        <item>文化</item>
+    </string-array>
+</resources>

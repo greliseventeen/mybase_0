@@ -1,0 +1,154 @@
+<!--
+存放路径：D:\Android app\run_temp\konming_app\html\upload_post.html
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>孔明 · 发帖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        * {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+        }
+        
+        .action-sheet-mask {
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-[412px] bg-[#F5F5F5] rounded-3xl shadow-2xl overflow-hidden relative">
+        <div class="min-h-[896px] flex flex-col">
+            <div class="bg-white px-4 pt-12 pb-4 shadow-sm flex items-center justify-between">
+                <button class="p-1">
+                    <svg class="w-6 h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h1 class="text-[20px] font-bold text-[#1A1A1A]">发帖</h1>
+                <div class="flex items-center gap-3">
+                    <button class="text-[#757575] text-[14px] font-medium">存草稿</button>
+                    <button class="px-5 py-2 bg-[#C41E3A] text-white text-[14px] font-semibold rounded-lg">发布</button>
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto px-4 py-4">
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <textarea 
+                        class="w-full h-[200px] text-[14px] text-[#1A1A1A] placeholder-[#757575] resize-none focus:outline-none leading-relaxed"
+                        placeholder="分享你的政策学习心得..."
+                    >今天学习了最新的乡村振兴政策，感触很深。国家对农业农村的支持力度越来越大，希望能和大家一起交流学习心得~</textarea>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="relative aspect-square">
+                            <img src="https://picsum.photos/120/120?random=1" alt="图片1" class="w-full h-full rounded-lg object-cover">
+                            <button class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative aspect-square">
+                            <img src="https://picsum.photos/120/120?random=2" alt="图片2" class="w-full h-full rounded-lg object-cover">
+                            <button class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative aspect-square">
+                            <img src="https://picsum.photos/120/120?random=3" alt="图片3" class="w-full h-full rounded-lg object-cover">
+                            <button class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50">
+                            <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-4 pb-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div class="flex-1">
+                        <p class="text-amber-800 text-[13px]">需要相册权限用于选择图片</p>
+                    </div>
+                    <button class="text-[#C41E3A] text-[13px] font-medium">去设置</button>
+                </div>
+            </div>
+            
+            <div class="h-14 bg-white border-t border-gray-100 flex items-center justify-around px-2">
+                <div class="flex flex-col items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span class="text-[10px] text-gray-400 mt-0.5">推荐</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <span class="text-[10px] text-gray-400 mt-0.5">智能体</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 -mt-8 bg-[#C41E3A] rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span class="text-[10px] text-gray-400 mt-0.5">社区</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span class="text-[10px] text-gray-400 mt-0.5">我的</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute inset-0 flex flex-col justify-end action-sheet-mask">
+            <div class="bg-white rounded-t-2xl p-4 pb-8">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                <div class="space-y-3">
+                    <button class="w-full py-4 bg-[#C41E3A] text-white text-[16px] font-semibold rounded-xl flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        发帖
+                    </button>
+                    <button class="w-full py-4 bg-white text-[#1A1A1A] text-[16px] font-medium rounded-xl flex items-center justify-center gap-2 border border-gray-200">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        上传音视频/文章
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

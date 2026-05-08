@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="首页" />
+    <item
+        android:id="@+id/agentFragment"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="智能体" />
+    <item
+        android:id="@+id/publishFragment"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="发布" />
+    <item
+        android:id="@+id/communityFragment"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="社区" />
+    <item
+        android:id="@+id/mineFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="我的" />
+</menu>

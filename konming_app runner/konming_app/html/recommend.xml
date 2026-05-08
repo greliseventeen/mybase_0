@@ -1,0 +1,499 @@
+<!--
+存放路径：D:\Android app\run_temp\konming_app\html\recommend.xml
+
+页面布局结构描述：
+
+根布局：
+- ConstraintLayout 或 LinearLayout（垂直排列）
+- 背景色：#F5F5F5
+
+包含以下子控件（按顺序从上到下）：
+
+1. 顶部标题栏
+   - ConstraintLayout 或 LinearLayout
+     - 背景色：#FFFFFF
+     - 顶部内边距：48dp（适配状态栏）
+     - 左右内边距：16dp
+     - 底部内边距：16dp
+   - TextView：标题"推荐"
+     - 文本大小：20sp
+     - 字体粗细：bold
+     - 文字颜色：#1A1A1A
+
+2. 分类标签栏
+   - HorizontalScrollView
+     - 背景色：#FFFFFF
+     - 底部边框：1px #F0F0F0
+     - 内边距：左右16dp，上下12dp
+   - LinearLayout（水平排列）
+     - 子控件间距：8dp
+     - Button（多个）：分类标签
+       - 高度：32dp
+       - 内边距：左右16dp
+       - 圆角：16dp
+       - 文字大小：13sp
+       - 字体粗细：medium
+       - 选中状态：
+         - 背景色：#C41E3A
+         - 文字颜色：#FFFFFF
+       - 未选中状态：
+         - 背景色：透明
+         - 边框：2dp #C59B27 或 #BDBDBD
+         - 文字颜色：#C59B27 或 #757575
+
+3. 下拉刷新提示
+   - LinearLayout（水平居中）
+     - 内边距：上下8dp
+   - TextView："下拉刷新"
+     - 文字大小：12sp
+     - 文字颜色：#757575
+
+4. 内容列表区域
+   - SwipeRefreshLayout
+     - 包含 RecyclerView
+   - RecyclerView
+     - 布局管理器：StaggeredGridLayoutManager
+       - 列数：2
+       - 方向：VERTICAL
+     - Item间距：12dp
+     - 背景色：#F5F5F5
+     - 内边距：左右16dp，上下12dp
+   - 空状态视图（默认隐藏）
+     - ConstraintLayout（居中）
+     - ImageView：空状态插画
+       - 宽高：128dp
+       - 背景：#F0F0F0 圆形
+     - TextView："暂无推荐内容，快去上传吧~"
+       - 文字大小：14sp
+       - 文字颜色：#757575
+       - 上边距：24dp
+
+5. 卡片Item布局
+   - CardView
+     - 圆角：12dp
+     - 阴影：轻微
+     - 背景色：#FFFFFF
+   - ConstraintLayout
+     - ImageView：封面图
+       - 宽：match_parent
+       - 高：wrap_content
+       - 比例：16:9 或不等高瀑布流
+       - scaleType：centerCrop
+       - 图片源：picsum.photos
+     - TextView（可选）：文章标识
+       - 位置：左上角
+       - 背景色：#C41E3A
+       - 文字："文章"
+       - 文字大小：10sp
+       - 文字颜色：#FFFFFF
+       - 圆角：4dp
+       - 内边距：左右6dp，上下2dp
+       - 边距：8dp
+     - TextView（可选）：视频时长
+       - 位置：右上角
+       - 背景色：#000000（60%透明度）
+       - 文字："05:23"
+       - 文字大小：10sp
+       - 文字颜色：#FFFFFF
+       - 圆角：4dp
+       - 内边距：左右6dp，上下2dp
+       - 边距：8dp
+     - LinearLayout（垂直排列，在封面图下方）
+       - 内边距：12dp
+       - TextView：标题
+         - 文本大小：14sp
+         - 字体粗细：bold
+         - 文字颜色：#1A1A1A
+         - 最大行数：2
+         - ellipsize：end
+         - 行高：1.3倍
+       - ConstraintLayout（在标题下方）
+         - 上边距：8dp
+         - TextView：分区标签
+           - 文字："经济" / "民生" / "科技" / "文化"
+           - 文字大小：11sp
+           - 文字颜色：#C41E3A 或 #C59B27
+           - 边框：1dp 同文字颜色
+           - 圆角：8dp
+           - 内边距：左右6dp，上下2dp
+         - ImageButton：收藏按钮
+           - 位置：父布局右侧
+           - 宽高：20dp
+           - 未选中状态：灰色心形（线性）
+           - 选中状态：红色心形（填充）
+           - 背景：透明
+
+6. 加载更多（RecyclerView底部Item）
+   - LinearLayout（水平居中，垂直排列）
+     - 内边距：上下24dp
+   - ProgressBar：加载进度条
+     - 宽高：16dp
+     - 颜色：#C41E3A
+   - TextView："加载更多..."
+     - 文字大小：14sp
+     - 文字颜色：#757575
+     - 左边距：8dp
+
+7. 底部导航栏
+   - LinearLayout（水平排列）
+     - 高度：56dp
+     - 背景色：#FFFFFF
+     - 顶部边框：1px #F0F0F0
+     - 权重：平均分配
+   - 导航项（5个）
+     - LinearLayout（垂直居中）
+     - ImageView：图标
+       - 宽高：24dp
+       - 选中：#C41E3A
+       - 未选中：#BDBDBD
+     - TextView：文字
+       - 文字大小：10sp
+       - 上边距：2dp
+       - 选中：#C41E3A
+       - 未选中：#BDBDBD
+   - 中间发布按钮
+     - FrameLayout
+       - 宽高：48dp
+       - 背景：#C41E3A 圆形
+       - 上移：-16dp
+       - 阴影：明显
+     - ImageView：加号图标
+       - 宽高：24dp
+       - 颜色：#FFFFFF
+       - 居中
+
+关键属性说明：
+- 整体页面宽度固定为412px
+- 瀑布流使用StaggeredGridLayoutManager实现不等高效果
+- 所有圆角统一：按钮8dp，卡片12dp
+- 标签圆角：16dp（全圆）
+- 选中状态主色高亮
+- 支持下拉刷新和上拉加载更多
+-->
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingTop="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="推荐"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"/>
+
+    </LinearLayout>
+
+    <!-- 分类标签栏 -->
+    <HorizontalScrollView
+        android:id="@+id/categoryScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/titleBar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="全部"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/category_selected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="经济"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#C59B27"
+                android:background="@drawable/category_unselected_gold_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="民生"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#757575"
+                android:background="@drawable/category_unselected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="科技"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#757575"
+                android:background="@drawable/category_unselected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="文化"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#757575"
+                android:background="@drawable/category_unselected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- 下拉刷新提示 -->
+    <LinearLayout
+        android:id="@+id/refreshIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/categoryScroll">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下拉刷新"
+            android:textSize="12sp"
+            android:textColor="#757575"/>
+
+    </LinearLayout>
+
+    <!-- 内容列表 -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/refreshIndicator"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:clipToPadding="false"/>
+
+        <!-- 空状态视图 -->
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="64dp"
+            android:paddingBottom="64dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:background="@drawable/empty_state_background">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_empty_state"
+                    android:tint="#D0D0D0"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="暂无推荐内容，快去上传吧~"
+                android:textSize="14sp"
+                android:textColor="#757575"/>
+
+        </LinearLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- 底部导航栏 -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 推荐 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                android:tint="#C41E3A"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="推荐"
+                android:textSize="10sp"
+                android:textColor="#C41E3A"/>
+
+        </LinearLayout>
+
+        <!-- 智能体 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chat"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="智能体"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+        <!-- 发布按钮 -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/fab_background"
+                android:elevation="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_add"
+                    android:tint="#FFFFFF"/>
+
+            </FrameLayout>
+
+        </FrameLayout>
+
+        <!-- 社区 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_community"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="社区"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+        <!-- 我的 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_person"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="我的"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#C41E3A</color>
+    <color name="colorPrimaryDark">#A01932</color>
+    <color name="colorAccent">#C59B27</color>
+    
+    <!-- 自定义颜色 -->
+    <color name="bg_page">#F5F5F5</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#757575</color>
+    <color name="border_default">#E0E0E0</color>
+    <color name="duration_bg">#99000000</color>
+    <color name="empty_icon_color">#BDBDBD</color>
+</resources>

@@ -1,0 +1,450 @@
+<!--
+存放路径：D:\Android app\run_temp\konming_app\html\agent.xml
+
+页面布局结构描述：
+
+根布局：
+- ConstraintLayout 或 LinearLayout（垂直排列）
+- 背景色：#F5F5F5
+
+包含以下子控件（按顺序从上到下）：
+
+1. 顶部标题栏
+   - ConstraintLayout 或 LinearLayout
+     - 背景色：#FFFFFF
+     - 顶部内边距：48dp（适配状态栏）
+     - 左右内边距：16dp
+     - 底部内边距：16dp
+   - TextView：标题"孔明 · 政策助手"
+     - 文本大小：20sp
+     - 字体粗细：bold
+     - 文字颜色：#1A1A1A
+
+2. 模型选择标签栏
+   - HorizontalScrollView
+     - 背景色：#FFFFFF
+     - 底部边框：1px #F0F0F0
+     - 内边距：左右16dp，上下12dp
+   - LinearLayout（水平排列）
+     - 子控件间距：8dp
+     - Button（多个）：模型标签
+       - 高度：32dp
+       - 内边距：左右16dp
+       - 圆角：16dp
+       - 文字大小：13sp
+       - 字体粗细：medium
+       - 选中状态：
+         - 背景色：#C41E3A
+         - 文字颜色：#FFFFFF
+       - 未选中状态：
+         - 背景色：#F5F5F5
+         - 文字颜色：#1A1A1A
+
+3. 对话列表区域
+   - RecyclerView
+     - 宽：match_parent
+     - 高：0dp（weight=1）
+     - 背景色：#F5F5F5
+     - 内边距：左右16dp，上下16dp
+     - clipToPadding：false
+     - 布局管理器：LinearLayoutManager（VERTICAL）
+     - stackFromEnd：true（最新消息在底部）
+   - Item布局（AI消息，左对齐）
+     - ConstraintLayout
+       - ImageView：头像
+         - 宽高：40dp
+         - 背景：渐变#C41E3A到#E54B5F，圆形
+         - 文字："孔"（白色，14sp，bold）
+         - 或使用图片
+       - ConstraintLayout（消息气泡）
+         - 与头像右边距：12dp
+         - 最大宽度：260dp
+         - 背景：#FFFFFF，边框1px #E0E0E0，圆角20dp，左上角圆角4dp
+         - 内边距：16dp
+         - TextView：消息内容
+           - 文本大小：14sp
+           - 文字颜色：#1A1A1A
+           - 行高：1.5倍
+   - Item布局（用户消息，右对齐）
+     - ConstraintLayout
+       - ConstraintLayout（消息气泡）
+         - 最大宽度：260dp
+         - 背景：#C41E3A（20%透明度），圆角20dp，右上角圆角4dp
+         - 内边距：16dp
+         - TextView：消息内容
+           - 文本大小：14sp
+           - 文字颜色：#1A1A1A
+           - 行高：1.5倍
+   - Item布局（快捷问题）
+     - LinearLayout（垂直排列）
+       - 上边距：16dp
+       - LinearLayout（水平排列，第一行）
+         - 间距：8dp
+         - Button（快捷问题按钮）
+           - 背景：#FFFFFF，边框1px #E0E0E0，圆角16dp
+           - 内边距：左右16dp，上下8dp
+           - 文字大小：13sp
+           - 文字颜色：#1A1A1A
+       - LinearLayout（水平排列，第二行）
+         - 间距：8dp
+         - Button（快捷问题按钮）
+
+4. 底部输入区域
+   - ConstraintLayout 或 LinearLayout
+     - 背景色：#FFFFFF
+     - 顶部边框：1px #F0F0F0
+     - 内边距：16dp
+   - EditText：输入框
+     - 宽：0dp（weight=1）
+     - 高：wrap_content
+     - 最小高度：48dp
+     - 最大高度：120dp
+     - 背景：#F5F5F5，圆角12dp
+     - 内边距：16dp
+     - 文字大小：14sp
+     - 文字颜色：#1A1A1A
+     - 提示文字："输入您的问题…"
+     - 提示文字颜色：#757575
+     - 输入类型：textMultiLine
+     - 最大行数：4
+     - 右边距：12dp
+   - ImageButton：发送按钮
+     - 宽高：44dp
+     - 背景：圆形
+     - 无内容状态：
+       - 背景色：#BDBDBD
+     - 有内容状态：
+       - 背景色：#C41E3A
+       - 阴影：明显
+     - ImageView：纸飞机图标
+       - 宽高：20dp
+       - 颜色：#FFFFFF
+       - 居中
+
+5. 底部导航栏
+   - LinearLayout（水平排列）
+     - 高度：56dp
+     - 背景色：#FFFFFF
+     - 顶部边框：1px #F0F0F0
+     - 权重：平均分配
+   - 导航项（5个）
+     - LinearLayout（垂直居中）
+     - ImageView：图标
+       - 宽高：24dp
+       - 选中：#C41E3A
+       - 未选中：#BDBDBD
+     - TextView：文字
+       - 文字大小：10sp
+       - 上边距：2dp
+       - 选中：#C41E3A
+       - 未选中：#BDBDBD
+   - 中间发布按钮
+     - FrameLayout
+       - 宽高：48dp
+       - 背景：#C41E3A 圆形
+       - 上移：-16dp
+       - 阴影：明显
+     - ImageView：加号图标
+       - 宽高：24dp
+       - 颜色：#FFFFFF
+       - 居中
+
+关键属性说明：
+- 整体页面宽度固定为412px
+- 对话列表可滚动，最新消息在底部
+- AI消息和用户消息样式不同
+- 发送按钮根据输入状态变化颜色
+- 支持快捷问题点击
+- 所有圆角统一：按钮8dp，卡片12dp，气泡20dp
+- 选中状态主色高亮
+-->
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingTop="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="孔明 · 政策助手"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"/>
+
+    </LinearLayout>
+
+    <!-- 模型选择标签栏 -->
+    <HorizontalScrollView
+        android:id="@+id/modelScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/titleBar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="政策解读"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/model_selected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="惠民问答"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"
+                android:background="@drawable/model_unselected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="办事指南"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"
+                android:background="@drawable/model_unselected_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- 对话列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F5F5F5"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/modelScroll"
+        app:layout_constraintBottom_toTopOf="@id/inputArea"/>
+
+    <!-- 底部输入区域 -->
+    <LinearLayout
+        android:id="@+id/inputArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <EditText
+            android:id="@+id/messageInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:maxHeight="120dp"
+            android:background="@drawable/input_background"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="14sp"
+            android:textColor="#1A1A1A"
+            android:hint="输入您的问题…"
+            android:textColorHint="#757575"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:gravity="top|start"/>
+
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/send_button_background"
+            android:src="@drawable/ic_send"
+            android:tint="#FFFFFF"
+            android:scaleType="centerInside"
+            android:contentDescription="发送"/>
+
+    </LinearLayout>
+
+    <!-- 底部导航栏 -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 推荐 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="推荐"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+        <!-- 智能体 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chat"
+                android:tint="#C41E3A"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="智能体"
+                android:textSize="10sp"
+                android:textColor="#C41E3A"/>
+
+        </LinearLayout>
+
+        <!-- 发布按钮 -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/fab_background"
+                android:elevation="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_add"
+                    android:tint="#FFFFFF"/>
+
+            </FrameLayout>
+
+        </FrameLayout>
+
+        <!-- 社区 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_community"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="社区"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+        <!-- 我的 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_person"
+                android:tint="#BDBDBD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="我的"
+                android:textSize="10sp"
+                android:textColor="#BDBDBD"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

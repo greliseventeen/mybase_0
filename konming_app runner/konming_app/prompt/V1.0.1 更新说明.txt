@@ -1,0 +1,47 @@
+# V1.0.1 更新说明
+
+## 版本信息
+- 版本号：V1.0.1
+- 更新时间：2026-05-09-17:11
+- 类型：小功能/Bug修复
+
+## 改动内容
+
+### 1. 音频播放控制优化 (ContentDetailActivity)
+**文件修改：**
+- `app/src/main/res/layout/activity_content_detail.xml`
+- `app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+**改动详情：**
+- 将音频控制栏移至封面图上方，使用半透明白色背景 (#B0FFFFFF)
+- 控制栏高度设为 36dp，添加圆角和边距
+- 点击封面区域可切换控制栏显示/隐藏
+- 控制栏显示后 3 秒自动隐藏
+- 拖动进度条时暂停自动隐藏，停止拖动后恢复
+- 开始播放时自动显示控制栏并计时隐藏
+- 暂停/播放完成时取消自动隐藏
+
+### 2. 播放页面稳定性加固
+**文件修改：**
+- `app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+- `app/src/main/AndroidManifest.xml`
+
+**改动详情：**
+- 在 `onPause()` 中暂停播放并更新状态
+- 在 `onStop()` 中移除进度更新回调
+- 在 `onDestroy()` 中完整释放所有资源和回调
+- 为 `ContentDetailActivity` 和 `PostDetailActivity` 添加 `android:configChanges="orientation|screenSize|keyboardHidden"`，防止旋转时重建 Activity
+
+## 验证步骤
+1. 打开 App，进入推荐页
+2. 选择一个音频内容，进入详情页
+3. 点击播放按钮，验证控制栏自动显示
+4. 等待 3 秒，验证控制栏自动隐藏
+5. 点击封面区域，验证控制栏切换显示
+6. 拖动进度条，验证拖动时控制栏保持显示
+7. 按 Home 键或返回，验证正确暂停并释放资源
+8. 旋转屏幕，验证 Activity 不重建，播放状态保持
+
+## 备注
+- 评论系统相关功能（子任务4）待后续评论功能开发时完成
+- 当前项目暂未实现评论功能

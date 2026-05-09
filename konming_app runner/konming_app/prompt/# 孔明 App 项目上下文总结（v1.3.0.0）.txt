@@ -1,0 +1,490 @@
+# 孔明 App 项目上下文总结（v1.3.0.0）
+
+---
+
+# 孔明 App 项目上下文总结
+
+## 一、项目概述
+
+### 1.1 基本信息
+- **项目名称**：孔明 App (konming_app)
+- **包名**：com.example.konming_app
+- **技术栈**：Kotlin + Android原生开发
+- **最小SDK版本**：24 (Android 7.0)
+- **目标SDK版本**：36
+- **项目定位**：本地内容管理与社交应用
+- **目标用户**：需要本地存储视频、音频、文章，以及进行社区互动的用户
+
+### 1.2 核心功能
+- 用户注册/登录/账号切换
+- 视频、音频、文章上传与管理
+- 分类管理（预设+自定义）
+- 内容详情展示
+- 帖子发布与查看
+- 收藏功能
+- 浏览历史
+- 智能助手对话
+- 个人信息管理
+
+---
+
+## 二、技术架构与设计规范
+
+### 2.1 架构分层
+项目采用 **MVVM 架构模式**，分层清晰：
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                       UI Layer                            │
+│  Activity / Fragment / Adapter / ViewModel               │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────────────┐
+│                  Repository Layer                         │
+│  RepositoryFactory / UserRepository / ContentRepository  │
+│  PostRepository / CategoryRepository / ...               │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────────────┐
+│                   Data Layer                             │
+│  AppDatabaseHelper (SQLite) / PreferenceManager         │
+└─────────────────────────────────────────────────────────┘
+```
+
+**关键设计要点**：
+- **RepositoryFactory**：单例工厂，统一管理所有Repository的创建，确保全局一致性
+- **MVVM**：UI通过ViewModel处理业务逻辑，不直接操作数据库
+- **单例模式**：RepositoryFactory为单例，确保组件初始化一次
+
+### 2.2 设计风格
+
+#### 色彩规范
+```xml
+<!-- 主色调：红色系 -->
+<color name="colorPrimary">#C41E3A</color>        <!-- 主红 -->
+<color name="colorPrimaryDark">#A01932</color>   <!-- 深暗红 -->
+<color name="colorAccent">#C59B27</color>        <!-- 金色 -->
+
+<!-- 页面背景 -->
+<color name="bg_page">#F5F5F5</color>            <!-- 浅灰背景 -->
+<color name="bg_card">#FFFFFF</color>            <!-- 白卡片 -->
+
+<!-- 文字颜色 -->
+<color name="text_primary">#1A1A1A</color>       <!-- 主文字 -->
+<color name="text_secondary">#757575</color>     <!-- 次要文字 -->
+```
+
+#### 设计原则
+- **红白主题**：主色红色，辅以白色卡片
+- **清晰层级**：卡片式布局，层次分明
+- **组件复用**：可复用的UI组件设计
+
+### 2.3 文件组织规则
+项目采用**多级子包组织**，按功能和层次清晰划分：
+
+```
+app/src/main/java/com/example/konming_app/
+├── KonmingApplication.kt                    # 自定义Application
+├── data/                                    # 数据层
+│   ├── local/                               # 本地存储
+│   │   ├── AppDatabaseHelper.kt             # SQLite数据库
+│   │   └── PreferenceManager.kt             # SharedPreferences
+│   ├── model/                               # 数据模型
+│   │   ├── User.kt
+│   │   ├── Content.kt
+│   │   ├── Post.kt
+│   │   ├── FavoriteItem.kt
+│   │   ├── BrowseHistoryItem.kt
+│   │   └── Comment.kt
+│   └── repository/                          # Repository层
+│       ├── RepositoryFactory.kt
+│       ├── UserRepository.kt
+│       ├── ContentRepository.kt
+│       ├── PostRepository.kt
+│       ├── CategoryRepository.kt
+│       ├── BrowseHistoryRepository.kt
+│       └── CommentRepository.kt
+├── ui/                                      # UI层
+│   ├── common/                              # 公共UI
+│   │   ├── MainActivity.kt
+│   │   └── comment/
+│   ├── login/                               # 登录模块
+│   ├── home/                                # 推荐页
+│   ├── community/                           # 社区页
+│   ├── upload/                              # 上传模块
+│   ├── mine/                                # 个人中心
+│   ├── agent/                               # 智能助手
+│   └── browse/                              # 浏览历史
+└── util/                                    # 工具类
+    └── TimeFormatter.kt
+```
+
+---
+
+## 三、数据层详情
+
+### 3.1 数据库表结构（含建表SQL）
+
+**数据库信息**：
+- 数据库名称：konming.db
+- 数据库版本：4
+- 管理类：AppDatabaseHelper
+
+#### 表 1：users（用户表）
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    nickname TEXT,
+    avatar_path TEXT,
+    bio TEXT
+)
+```
+**字段说明**：
+- `id`：用户ID（生成100000-999999的随机数）
+- `username`：用户名（唯一）
+- `password`：密码
+- `nickname`：昵称
+- `avatar_path`：头像路径
+- `bio`：个人简介
+
+#### 表 2：contents（内容表）
+```sql
+CREATE TABLE contents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    cover_path TEXT,
+    category TEXT,
+    description TEXT,
+    file_path TEXT,
+    type TEXT NOT NULL,
+    duration INTEGER,
+    timestamp INTEGER NOT NULL
+)
+```
+**字段说明**：
+- `id`：内容ID（自增）
+- `user_id`：发布者用户ID
+- `title`：标题
+- `cover_path`：封面路径
+- `category`：分类
+- `description`：描述
+- `file_path`：文件路径
+- `type`：类型（video/audio/article）
+- `duration`：时长（毫秒）
+- `timestamp`：时间戳
+
+#### 表 3：posts（帖子表）
+```sql
+CREATE TABLE posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title TEXT DEFAULT '',
+    content TEXT NOT NULL,
+    image_paths TEXT,
+    timestamp INTEGER NOT NULL
+)
+```
+**字段说明**：
+- `id`：帖子ID（自增）
+- `user_id`：发布者用户ID
+- `title`：标题
+- `content`：内容
+- `image_paths`：图片路径（多个用分号分隔）
+- `timestamp`：时间戳
+
+#### 表 4：favorites（收藏表）
+```sql
+CREATE TABLE favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    content_id INTEGER,
+    post_id INTEGER,
+    timestamp INTEGER NOT NULL,
+    UNIQUE(user_id, content_id, post_id)
+)
+```
+**字段说明**：
+- `id`：收藏记录ID
+- `user_id`：用户ID
+- `content_id`：内容ID（可为空）
+- `post_id`：帖子ID（可为空）
+- `timestamp`：收藏时间
+- 唯一约束：同一用户不能重复收藏同一内容
+
+#### 表 5：browse_history（浏览历史表）
+```sql
+CREATE TABLE browse_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    content_id INTEGER,
+    post_id INTEGER,
+    browse_time INTEGER NOT NULL
+)
+```
+
+#### 表 6：categories（分类表）
+```sql
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    is_default INTEGER DEFAULT 0
+)
+```
+**字段说明**：
+- `is_default`：是否为预设分类（1是，0否）
+- 预设分类：经济、民生、法治、生态、科技、文化
+
+#### 表 7：comments（评论表）
+```sql
+CREATE TABLE comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    like_count INTEGER DEFAULT 0,
+    timestamp INTEGER NOT NULL
+)
+```
+**字段说明**：
+- `target_type`：目标类型（content/post）
+- `target_id`：目标ID
+- `like_count`：点赞数
+
+### 3.2 Repository 关键方法
+
+#### RepositoryFactory（单例工厂）
+```kotlin
+// 初始化（必须在应用启动时调用）
+fun initialize(context: Context)
+
+// 获取各Repository
+fun getUserRepository(): UserRepository
+fun getContentRepository(): ContentRepository
+fun getPostRepository(): PostRepository
+fun getBrowseHistoryRepository(): BrowseHistoryRepository
+fun getCategoryRepository(): CategoryRepository
+fun getCommentRepository(): CommentRepository
+
+// 获取PreferenceManager
+fun getPreferenceManager(): PreferenceManager
+```
+
+#### UserRepository
+```kotlin
+// 用户注册
+fun register(username: String, password: String): Int?
+
+// 用户登录
+fun login(username: String, password: String): Int?
+
+// 获取用户信息
+fun getUserInfo(userId: Int): User?
+
+// 批量获取用户信息（用于发布者信息显示）
+fun getUsersByIds(userIds: List<Int>): Map<Int, User>
+
+// 更新用户信息
+fun updateAvatarPath(userId: Int, avatarPath: String)
+fun updateNickname(userId: Int, nickname: String)
+fun updateBio(userId: Int, bio: String)
+fun updatePassword(userId: Int, password: String)
+```
+
+#### ContentRepository
+```kotlin
+// 插入内容
+fun insertContent(content: Content): Long
+
+// 获取内容列表（分页）
+fun getAllContents(page: Int, pageSize: Int): List<Content>
+
+// 获取单个内容
+fun getContentById(id: Int): Content?
+
+// 收藏相关
+fun addToFavorites(userId: Int, contentId: Int): Boolean
+fun removeFavorite(userId: Int, contentId: Int): Boolean
+fun isFavorited(userId: Int, contentId: Int): Boolean
+fun getFavoriteContentIds(userId: Int): List<Int>
+fun getFavoriteContents(userId: Int): List<Content>
+
+// 获取用户发布的内容
+fun getContentsByUserId(userId: Int): List<Content>
+
+// 删除内容
+fun deleteContent(contentId: Int)
+```
+
+#### PostRepository
+```kotlin
+// 插入帖子
+fun insertPost(post: Post): Long
+
+// 获取帖子列表（分页）
+fun getAllPosts(page: Int, pageSize: Int): List<Post>
+
+// 获取单个帖子
+fun getPostById(id: Int): Post?
+
+// 收藏相关（同ContentRepository）
+fun addToFavorites(userId: Int, postId: Int): Boolean
+fun removeFavorite(userId: Int, postId: Int): Boolean
+fun isFavorited(userId: Int, postId: Int): Boolean
+fun getFavoritePostIds(userId: Int): List<Int>
+fun getFavoritePosts(userId: Int): List<Post>
+
+// 获取用户发布的帖子
+fun getPostsByUserId(userId: Int): List<Post>
+
+// 删除帖子
+fun deletePost(postId: Int)
+```
+
+---
+
+## 四、各功能模块详情
+
+### 4.1 登录/注册模块
+
+**文件路径**：
+- `ui/login/LoginActivity.kt`：登录页面
+- `ui/login/RegisterActivity.kt`：注册页面
+- `ui/login/BaseAuthActivity.kt`：认证基类
+
+**功能**：
+- 用户注册（生成随机用户ID）
+- 用户登录（验证用户名密码）
+- 登录状态持久化（通过PreferenceManager）
+
+### 4.2 推荐页（主页）
+
+**文件路径**：
+- `ui/home/HomeFragment.kt`：主页Fragment
+- `ui/home/HomeViewModel.kt`：主页ViewModel
+- `ui/home/ContentAdapter.kt`：内容适配器
+- `ui/home/CategoryAdapter.kt`：分类适配器
+- `ui/home/ContentDetailActivity.kt`：内容详情页
+
+**功能特性**：
+- 瀑布流布局（2列）展示内容
+- 分类筛选（水平滚动分类列表）
+- 下拉刷新
+- 上拉加载更多
+- 内容卡片显示：封面（18:9比例）、标题、发布者昵称和头像
+- 收藏功能（心形按钮）
+- 点击进入详情页
+
+**关键修复**：
+- ✅ 主页内容丢失Bug修复：ViewModel绑定到Activity（`ViewModelProvider(requireActivity())`）
+- ✅ 在`onResume`中检查数据，为空则刷新
+- ✅ 发布者信息显示：显示头像和昵称，而非用户ID
+
+### 4.3 社区页
+
+**文件路径**：
+- `ui/community/CommunityFragment.kt`：社区Fragment
+- `ui/community/CommunityViewModel.kt`：社区ViewModel
+- `ui/community/PostAdapter.kt`：帖子适配器
+- `ui/community/PostDetailActivity.kt`：帖子详情页
+
+**功能特性**：
+- 帖子列表展示
+- 帖子卡片显示：发布者信息、标题、内容、图片
+- 点击进入详情页
+- 支持图片网格布局（3列）
+
+### 4.4 智能助手
+
+**文件路径**：
+- `ui/agent/AgentFragment.kt`：助手Fragment
+- `ui/agent/AgentViewModel.kt`：助手ViewModel
+- `ui/agent/MessageAdapter.kt`：消息适配器
+
+**功能**：
+- 对话界面
+- 消息历史展示
+
+### 4.5 上传/发布模块
+
+**文件路径**：
+- `ui/upload/UploadContentActivity.kt`：上传内容（视频/音频/文章）
+- `ui/upload/PostEditActivity.kt`：编辑帖子
+- `ui/upload/UploadContentViewModel.kt`：上传ViewModel
+
+**功能**：
+- 视频、音频、文章上传
+- 支持封面选择
+- 支持分类选择（预设+自定义）
+- 帖子发布（支持图片）
+
+### 4.6 个人中心
+
+**文件路径**：
+- `ui/mine/MineFragment.kt`：个人中心Fragment
+- `ui/mine/MineViewModel.kt`：个人中心ViewModel
+- `ui/mine/favorite/FavoriteListActivity.kt`：收藏列表
+- `ui/mine/publish/MyPublishActivity.kt`：我的发布
+- `ui/mine/AccountSwitchActivity.kt`：账号切换
+- `ui/mine/ChangePasswordActivity.kt`：修改密码
+
+**功能**：
+- 显示用户信息（头像、昵称、简介）
+- 编辑个人资料
+- 修改密码
+- 账号切换
+- 我的发布（内容+帖子）
+- 我的收藏
+- 浏览历史
+- 数据库管理
+
+---
+
+## 五、当前版本状态说明
+
+### 5.1 已完成功能清单
+
+**核心功能**：
+- ✅ 用户系统（注册/登录/信息管理/账号切换）
+- ✅ 内容管理（上传/查看/分类）
+- ✅ 社区功能（发帖/查看帖子）
+- ✅ 收藏功能
+- ✅ 浏览历史
+- ✅ 智能助手
+- ✅ RepositoryFactory单例管理
+
+**UI优化**：
+- ✅ 主页美化（瀑布流、封面比例18:9）
+- ✅ 发布者信息显示（头像+昵称）
+- ✅ 红白主题设计
+
+**Bug修复**：
+- ✅ 主页内容丢失Bug（ViewModel绑定到Activity + onResume刷新检查）
+
+### 5.2 已知问题与待修复Bug
+
+**无已知严重Bug**
+
+### 5.3 当前版本断点说明
+
+**重要说明**：
+当前版本为**"主页美化、内容丢失Bug修复、发布者信息显示"**完成后的版本。
+
+**注意事项**：
+- 代码库中存在后续扩展功能的文件（如评论系统`ui/common/comment/`、全屏视频播放等）
+- 如需严格回退到该版本断点，可能需要清理后续扩展的代码
+- 当前数据库版本为4（已包含后续扩展的表结构）
+
+**快速上手提示**：
+1. 务必通过`RepositoryFactory`获取Repository，不要直接操作数据库
+2. `RepositoryFactory.initialize()`必须在应用启动时调用（已在`MainActivity`中实现）
+3. ViewModel中使用`ViewModelProvider(requireActivity())`绑定Activity以保持数据
+4. 所有用户信息展示使用`UserRepository.getUserInfo()`获取完整用户信息
+
+---
+
+**文档生成时间**：2026-04-30
+**适用版本**：主页美化、内容丢失Bug修复、发布者信息显示完成版

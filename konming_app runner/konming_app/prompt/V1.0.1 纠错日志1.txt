@@ -1,0 +1,41 @@
+# V1.0.1 纠错日志1
+
+## 错误信息
+- 文件：`ContentDetailActivity.kt`
+- 行号：335
+- 错误：`Argument type mismatch: actual type is 'Runnable?', but 'Runnable' was expected.`
+
+## 排查过程
+1. 错误发生在 `startUpdateSeekBar()` 方法中
+2. `updateSeekBarRunnable` 被声明为 `Runnable?` 可空类型
+3. 直接传递给 `handler.post()` 时，编译器无法确认非空
+
+## 修复方案
+将 Runnable 先赋值给一个局部非空变量 `runnable`，再同时赋值给 `updateSeekBarRunnable` 和传递给 `handler.post()`
+
+## 修改文件
+`app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+## 修改代码段
+```kotlin
+// 修改前
+private fun startUpdateSeekBar() {
+    updateSeekBarRunnable = object : Runnable {
+        override fun run() {
+            // ...
+        }
+    }
+    handler.post(updateSeekBarRunnable)
+}
+
+// 修改后
+private fun startUpdateSeekBar() {
+    val runnable = object : Runnable {
+        override fun run() {
+            // ...
+        }
+    }
+    updateSeekBarRunnable = runnable
+    handler.post(runnable)
+}
+```

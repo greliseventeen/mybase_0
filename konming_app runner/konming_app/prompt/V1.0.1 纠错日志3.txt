@@ -1,0 +1,42 @@
+# V1.0.1 纠错日志3
+
+## 问题描述
+- 用户反馈：视频播放页面的控制栏改动未实现，控制按钮仍位于页面中央
+- 截图显示：视频播放区域有中央播放控制按钮
+
+## 根本原因
+之前的修改只针对**音频**播放控制，而截图显示的是**视频**播放页面，视频使用的是 ExoPlayer，需要单独处理。
+
+## 修复方案
+### 1. 修改布局文件 (activity_content_detail.xml)
+- 为视频播放区域的 FrameLayout 添加 id `frame_video`
+- 设置 `android:clickable="true"` 和 `android:focusable="true"`
+
+### 2. 修改 Activity (ContentDetailActivity.kt)
+- 添加 `frameVideo` 成员变量
+- 在 `initViews()` 中绑定视图
+- 添加 `frameVideo` 点击事件，调用 `toggleVideoPlayPause()`
+- 添加 `toggleVideoPlayPause()` 方法，控制 ExoPlayer 播放/暂停
+
+## 修改文件
+1. `app/src/main/res/layout/activity_content_detail.xml`
+2. `app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+## 修改代码段
+```kotlin
+// 新增方法
+private fun toggleVideoPlayPause() {
+    exoPlayer?.let { player ->
+        if (player.isPlaying) {
+            player.pause()
+        } else {
+            player.play()
+        }
+    }
+}
+```
+
+## 验证步骤
+1. 进入推荐页，选择视频内容
+2. 点击视频区域，验证播放/暂停切换
+3. 检查控制栏位置是否正确

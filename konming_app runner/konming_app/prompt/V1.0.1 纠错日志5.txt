@@ -1,0 +1,48 @@
+# V1.0.1 纠错日志5
+
+## 错误信息
+- 文件：`ContentDetailActivity.kt`
+- 错误1：`Unresolved reference 'formatTime'` (行220, 338)
+- 错误2：`Argument type mismatch: actual type is 'Runnable?', but 'Runnable' was expected.` (行227)
+
+## 排查过程
+1. `formatTime` 方法在 `PostAdapter.kt` 中定义，但该方法是私有的，无法在其他类中调用
+2. `videoUpdateRunnable` 是 `Runnable?` 可空类型，无法直接传给 `handler.post()`
+
+## 修复方案
+
+### 1. 添加视频时间格式化方法
+添加 `formatVideoTime()` 方法，用于格式化播放时间（格式：mm:ss）：
+
+```kotlin
+private fun formatVideoTime(milliseconds: Long): String {
+    val seconds = milliseconds / 1000
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return String.format("%02d:%02d", minutes, remainingSeconds)
+}
+```
+
+### 2. 修复 Runnable 类型不匹配
+使用局部非空变量解决类型不匹配问题：
+
+```kotlin
+private fun startUpdateVideoSeekBar() {
+    val runnable = object : Runnable {
+        override fun run() {
+            // ...
+        }
+    }
+    videoUpdateRunnable = runnable
+    handler.post(runnable)
+}
+```
+
+### 3. 替换方法调用
+将 `formatTime()` 替换为 `formatVideoTime()`
+
+## 修改文件
+`app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+## 验证步骤
+清理并重新构建项目，确认无编译错误

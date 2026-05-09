@@ -5,9 +5,12 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
@@ -26,7 +29,19 @@ import java.io.File
 class ContentDetailActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_CONTENT_ID = "content_id"
-        private const val REQUEST_FULLSCREEN = 1001
+        private const val HIDE_CONTROLS_DELAY = 3000L
+    }
+
+    private val fullscreenLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val position = data.getLongExtra(FullscreenVideoActivity.EXTRA_PLAYBACK_POSITION, 0L)
+            val playWhenReady = data.getBooleanExtra(FullscreenVideoActivity.EXTRA_PLAY_WHEN_READY, false)
+            exoPlayer?.seekTo(position)
+            if (playWhenReady) {
+                exoPlayer?.play()
+            }
+        }
     }
 
     private lateinit var contentRepository: ContentRepository
@@ -39,13 +54,23 @@ class ContentDetailActivity : AppCompatActivity() {
     private lateinit var ivBack: ImageView
     private lateinit var tvTitle: TextView
     private lateinit var layoutVideo: android.widget.LinearLayout
+    private lateinit var frameVideo: android.widget.FrameLayout
     private lateinit var playerView: PlayerView
+    private lateinit var layoutVideoControls: android.widget.LinearLayout
+    private lateinit var ivVideoPlayPause: ImageView
+    private lateinit var videoSeekBar: SeekBar
+    private lateinit var tvVideoCurrentTime: TextView
+    private lateinit var tvVideoTotalTime: TextView
     private lateinit var ivFullscreen: ImageView
     private lateinit var layoutAudio: android.widget.LinearLayout
+    private lateinit var frameAudioCover: android.widget.FrameLayout
     private lateinit var ivCoverAudio: ImageView
+    private lateinit var layoutAudioControls: android.widget.LinearLayout
     private lateinit var ivPlayPause: ImageView
     private lateinit var seekBar: SeekBar
-    private lateinit var tvTime: TextView
+    private lateinit var tvCurrentTime: TextView
+    private lateinit var tvTotalTime: TextView
+    private var videoUpdateRunnable: Runnable? = null
     private lateinit var layoutArticle: android.widget.LinearLayout
     private lateinit var ivCoverArticle: ImageView
     private lateinit var tvContentTitle: TextView
@@ -53,7 +78,9 @@ class ContentDetailActivity : AppCompatActivity() {
     private lateinit var tvContentType: TextView
     private lateinit var tvContentDesc: TextView
 
+    private val handler = Handler(Looper.getMainLooper())
     private var updateSeekBarRunnable: Runnable? = null
+    private var hideControlsRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,13 +99,22 @@ class ContentDetailActivity : AppCompatActivity() {
         ivBack = findViewById(R.id.iv_back)
         tvTitle = findViewById(R.id.tv_title)
         layoutVideo = findViewById(R.id.layout_video)
+        frameVideo = findViewById(R.id.frame_video)
         playerView = findViewById(R.id.player_view)
+        layoutVideoControls = findViewById(R.id.layout_video_controls)
+        ivVideoPlayPause = findViewById(R.id.iv_video_play_pause)
+        videoSeekBar = findViewById(R.id.video_seek_bar)
+        tvVideoCurrentTime = findViewById(R.id.tv_video_current_time)
+        tvVideoTotalTime = findViewById(R.id.tv_video_total_time)
         ivFullscreen = findViewById(R.id.iv_fullscreen)
         layoutAudio = findViewById(R.id.layout_audio)
+        frameAudioCover = findViewById(R.id.frame_audio_cover)
         ivCoverAudio = findViewById(R.id.iv_cover_audio)
+        layoutAudioControls = findViewById(R.id.layout_audio_controls)
         ivPlayPause = findViewById(R.id.iv_play_pause)
         seekBar = findViewById(R.id.seek_bar)
-        tvTime = findViewById(R.id.tv_time)
+        tvCurrentTime = findViewById(R.id.tv_current_time)
+        tvTotalTime = findViewById(R.id.tv_total_time)
         layoutArticle = findViewById(R.id.layout_article)
         ivCoverArticle = findViewById(R.id.iv_cover_article)
         tvContentTitle = findViewById(R.id.tv_content_title)
@@ -98,6 +134,18 @@ class ContentDetailActivity : AppCompatActivity() {
             togglePlayPause()
         }
 
+        ivVideoPlayPause.setOnClickListener {
+            toggleVideoPlayPause()
+        }
+
+        frameAudioCover.setOnClickListener {
+            toggleAudioControlsVisibility()
+        }
+
+        frameVideo.setOnClickListener {
+            toggleVideoControlsVisibility()
+        }
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -105,15 +153,117 @@ class ContentDetailActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                cancelHideControls()
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                scheduleHideControls()
+            }
         })
+
+        videoSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    exoPlayer?.seekTo(progress.toLong())
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                cancelHideControls()
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                scheduleHideControls()
+            }
+        })
+    }
+
+    private fun toggleVideoControlsVisibility() {
+        if (layoutVideoControls.visibility == android.view.View.VISIBLE) {
+            layoutVideoControls.visibility = android.view.View.GONE
+            cancelHideControls()
+        } else {
+            layoutVideoControls.visibility = android.view.View.VISIBLE
+            scheduleHideControls()
+        }
+    }
+
+    private fun toggleVideoPlayPause() {
+        exoPlayer?.let { player ->
+            if (player.isPlaying) {
+                player.pause()
+                cancelHideControls()
+            } else {
+                player.play()
+                layoutVideoControls.visibility = android.view.View.VISIBLE
+                scheduleHideControls()
+            }
+            updateVideoPlayPauseIcon()
+        }
+    }
+
+    private fun updateVideoPlayPauseIcon() {
+        exoPlayer?.let { player ->
+            ivVideoPlayPause.setImageResource(
+                if (player.isPlaying) android.R.drawable.ic_media_pause
+                else android.R.drawable.ic_media_play
+            )
+        }
+    }
+
+    private fun startUpdateVideoSeekBar() {
+        val runnable = object : Runnable {
+            override fun run() {
+                exoPlayer?.let { player ->
+                    videoSeekBar.progress = player.currentPosition.toInt()
+                    tvVideoCurrentTime.text = formatVideoTime(player.currentPosition)
+                    if (player.isPlaying) {
+                        handler.postDelayed(this, 1000)
+                    }
+                }
+            }
+        }
+        videoUpdateRunnable = runnable
+        handler.post(runnable)
+    }
+
+    private fun formatVideoTime(milliseconds: Long): String {
+        val seconds = milliseconds / 1000
+        val minutes = seconds / 60
+        val remainingSeconds = seconds % 60
+        return String.format("%02d:%02d", minutes, remainingSeconds)
+    }
+
+    private fun toggleAudioControlsVisibility() {
+        if (layoutAudioControls.visibility == android.view.View.VISIBLE) {
+            layoutAudioControls.visibility = android.view.View.GONE
+            cancelHideControls()
+        } else {
+            layoutAudioControls.visibility = android.view.View.VISIBLE
+            scheduleHideControls()
+        }
+    }
+
+    private fun scheduleHideControls() {
+        cancelHideControls()
+        hideControlsRunnable = Runnable {
+            layoutAudioControls.visibility = android.view.View.GONE
+        }
+        handler.postDelayed(hideControlsRunnable!!, HIDE_CONTROLS_DELAY)
+    }
+
+    private fun cancelHideControls() {
+        hideControlsRunnable?.let {
+            handler.removeCallbacks(it)
+        }
     }
 
     private fun openFullscreenVideo() {
         videoUri?.let { uri ->
-            val position = exoPlayer?.currentPosition ?: 0
+            val position = exoPlayer?.currentPosition ?: 0L
             val playWhenReady = exoPlayer?.isPlaying ?: false
+            val isLandscape = content?.isLandscape ?: true
             
             exoPlayer?.pause()
             
@@ -121,21 +271,9 @@ class ContentDetailActivity : AppCompatActivity() {
                 putExtra(FullscreenVideoActivity.EXTRA_VIDEO_URI, uri)
                 putExtra(FullscreenVideoActivity.EXTRA_PLAYBACK_POSITION, position)
                 putExtra(FullscreenVideoActivity.EXTRA_PLAY_WHEN_READY, playWhenReady)
+                putExtra(FullscreenVideoActivity.EXTRA_IS_LANDSCAPE, isLandscape)
             }
-            startActivityForResult(intent, REQUEST_FULLSCREEN)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_FULLSCREEN && resultCode == Activity.RESULT_OK) {
-            val position = data?.getLongExtra(FullscreenVideoActivity.EXTRA_PLAYBACK_POSITION, 0) ?: 0
-            val playWhenReady = data?.getBooleanExtra(FullscreenVideoActivity.EXTRA_PLAY_WHEN_READY, false) ?: false
-            
-            exoPlayer?.seekTo(position)
-            if (playWhenReady) {
-                exoPlayer?.play()
-            }
+            fullscreenLauncher.launch(intent)
         }
     }
 
@@ -201,6 +339,25 @@ class ContentDetailActivity : AppCompatActivity() {
                 player.setMediaItem(mediaItem)
                 player.prepare()
                 player.play()
+                
+                player.addListener(object : androidx.media3.common.Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        when (playbackState) {
+                            androidx.media3.common.Player.STATE_READY -> {
+                                videoSeekBar.max = player.duration.toInt()
+                                tvVideoTotalTime.text = formatVideoTime(player.duration)
+                                layoutVideoControls.visibility = android.view.View.VISIBLE
+                                scheduleHideControls()
+                                startUpdateVideoSeekBar()
+                                updateVideoPlayPauseIcon()
+                            }
+                            androidx.media3.common.Player.STATE_ENDED -> {
+                                cancelHideControls()
+                                updateVideoPlayPauseIcon()
+                            }
+                        }
+                    }
+                })
             }
         }
     }
@@ -227,9 +384,29 @@ class ContentDetailActivity : AppCompatActivity() {
                 setOnCompletionListener {
                     this@ContentDetailActivity.isPlaying = false
                     updatePlayPauseButton()
+                    cancelHideControls()
                 }
                 seekBar.max = duration
                 updateTimeDisplay()
+            }
+        }
+    }
+
+    private fun togglePlayPause() {
+        mediaPlayer?.let {
+            if (isPlaying) {
+                it.pause()
+            } else {
+                it.start()
+                startUpdateSeekBar()
+            }
+            isPlaying = !isPlaying
+            updatePlayPauseButton()
+            if (isPlaying) {
+                layoutAudioControls.visibility = android.view.View.VISIBLE
+                scheduleHideControls()
+            } else {
+                cancelHideControls()
             }
         }
     }
@@ -248,19 +425,6 @@ class ContentDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun togglePlayPause() {
-        mediaPlayer?.let {
-            if (isPlaying) {
-                it.pause()
-            } else {
-                it.start()
-                startUpdateSeekBar()
-            }
-            isPlaying = !isPlaying
-            updatePlayPauseButton()
-        }
-    }
-
     private fun updatePlayPauseButton() {
         if (isPlaying) {
             ivPlayPause.setImageResource(android.R.drawable.ic_media_pause)
@@ -270,24 +434,26 @@ class ContentDetailActivity : AppCompatActivity() {
     }
 
     private fun startUpdateSeekBar() {
-        updateSeekBarRunnable = object : Runnable {
+        val runnable = object : Runnable {
             override fun run() {
                 mediaPlayer?.let {
                     if (it.isPlaying) {
                         seekBar.progress = it.currentPosition
                         updateTimeDisplay()
-                        ivPlayPause.postDelayed(this, 1000)
+                        handler.postDelayed(this, 1000)
                     }
                 }
             }
         }
-        ivPlayPause.post(updateSeekBarRunnable)
+        updateSeekBarRunnable = runnable
+        handler.post(runnable)
     }
 
     private fun updateTimeDisplay() {
         val current = mediaPlayer?.currentPosition ?: 0
         val total = mediaPlayer?.duration ?: 0
-        tvTime.text = "${formatDuration(current)}/${formatDuration(total)}"
+        tvCurrentTime.text = formatDuration(current)
+        tvTotalTime.text = formatDuration(total)
     }
 
     private fun formatDuration(ms: Int): String {
@@ -297,14 +463,13 @@ class ContentDetailActivity : AppCompatActivity() {
         return String.format("%02d:%02d", mins, secs)
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         mediaPlayer?.let {
             if (it.isPlaying) {
                 it.pause()
-            }
-            updateSeekBarRunnable?.let { runnable ->
-                ivPlayPause.removeCallbacks(runnable)
+                isPlaying = false
+                updatePlayPauseButton()
             }
         }
         exoPlayer?.let {
@@ -312,10 +477,28 @@ class ContentDetailActivity : AppCompatActivity() {
                 it.pause()
             }
         }
+        cancelHideControls()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        updateSeekBarRunnable?.let { runnable ->
+            handler.removeCallbacks(runnable)
+        }
+        videoUpdateRunnable?.let { runnable ->
+            handler.removeCallbacks(runnable)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        cancelHideControls()
+        updateSeekBarRunnable?.let {
+            handler.removeCallbacks(it)
+        }
+        videoUpdateRunnable?.let {
+            handler.removeCallbacks(it)
+        }
         mediaPlayer?.release()
         mediaPlayer = null
         exoPlayer?.release()

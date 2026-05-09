@@ -1,0 +1,48 @@
+# V1.0.1 纠错日志6
+
+## 问题描述
+用户反馈：全屏播放页面控制栏位于页面中央，且3秒自动隐藏功能未实现。
+
+## 根本原因
+1. 全屏播放页面 (`FullscreenVideoActivity`) 仍使用 ExoPlayer 默认控制栏 (`app:use_controller="true"`)
+2. 缺少自定义控制栏和自动隐藏逻辑
+
+## 修复方案
+
+### 1. 修改布局文件 (activity_fullscreen_video.xml)
+- 禁用默认控制栏：`app:use_controller="false"`
+- 添加容器点击监听：`android:clickable="true"`
+- 添加自定义控制栏 `layout_fullscreen_controls`：
+  - 位置：屏幕底部（`android:layout_gravity="bottom"`）
+  - 高度：36dp
+  - 背景：半透明白色 `#B0FFFFFF`
+  - 包含：播放/暂停按钮、当前时间、进度条、总时间
+
+### 2. 修改 Activity 代码 (FullscreenVideoActivity.kt)
+- 添加控制栏相关变量和方法
+- 添加点击屏幕切换控制栏显示/隐藏
+- 添加3秒自动隐藏功能（`HIDE_CONTROLS_DELAY = 3000L`）
+- 播放时自动开始计时隐藏
+- 暂停时取消自动隐藏
+- 播放结束时显示控制栏
+- 拖动进度条时暂停自动隐藏
+
+## 修改文件
+1. `app/src/main/res/layout/activity_fullscreen_video.xml`
+2. `app/src/main/java/com/example/konming_app/ui/home/FullscreenVideoActivity.kt`
+
+## 功能特性
+✅ 控制栏位于屏幕底部，半透明白色背景  
+✅ 点击屏幕切换控制栏显示/隐藏  
+✅ 播放时3秒自动隐藏  
+✅ 暂停时取消自动隐藏  
+✅ 播放结束时显示控制栏  
+✅ 拖动进度条时暂停自动隐藏  
+
+## 验证步骤
+1. 进入推荐页，选择视频内容
+2. 点击全屏按钮进入全屏播放
+3. 验证控制栏位于底部
+4. 点击屏幕验证显示/隐藏切换
+5. 等待3秒验证自动隐藏
+6. 点击播放/暂停验证控制栏显示

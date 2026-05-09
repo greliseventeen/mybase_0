@@ -1,0 +1,52 @@
+# V1.0.1 纠错日志4
+
+## 问题描述
+用户反馈：视频播放页面的控制栏改动仍然未实现，中央播放按钮依然显示。
+
+## 根本原因
+1. 视频播放使用 ExoPlayer，默认控制栏仍然启用 (`app:use_controller="true"`)
+2. 缺少自定义视频控制栏的完整实现
+3. 之前的修改仅针对音频播放，视频播放功能未完全覆盖
+
+## 修复方案
+
+### 1. 修改布局文件 (activity_content_detail.xml)
+- 禁用 ExoPlayer 默认控制栏：`app:use_controller="false"`
+- 添加自定义视频控制栏 `layout_video_controls`：
+  - 高度：36dp
+  - 背景：半透明白色 `#B0FFFFFF`
+  - 包含：播放/暂停按钮、当前时间、进度条、总时间
+  - 位置：视频区域底部，默认隐藏
+
+### 2. 修改 Activity 代码 (ContentDetailActivity.kt)
+- 添加视频控制栏相关变量：`layoutVideoControls`, `ivVideoPlayPause`, `videoSeekBar`, `tvVideoCurrentTime`, `tvVideoTotalTime`
+- 添加 `videoUpdateRunnable` 用于更新进度条
+- 添加 `toggleVideoControlsVisibility()` 方法：点击切换显示/隐藏
+- 添加 `toggleVideoPlayPause()` 方法：控制播放/暂停
+- 添加 `updateVideoPlayPauseIcon()` 方法：更新播放/暂停图标
+- 添加 `startUpdateVideoSeekBar()` 方法：启动进度条更新
+- 修改 `setupVideo()` 方法：
+  - 添加 ExoPlayer 监听器
+  - `STATE_READY` 时初始化控制栏并显示
+  - `STATE_ENDED` 时取消自动隐藏
+- 修改生命周期方法：清理视频更新任务
+
+## 修改文件
+1. `app/src/main/res/layout/activity_content_detail.xml`
+2. `app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+## 功能特性
+✅ 视频控制栏位于视频区域底部，半透明白色背景
+✅ 点击视频区域切换控制栏显示/隐藏
+✅ 播放时自动显示，3秒后自动隐藏
+✅ 拖动进度条时暂停自动隐藏
+✅ 播放结束时取消自动隐藏
+✅ 暂停时取消自动隐藏
+
+## 验证步骤
+1. 进入推荐页，选择视频内容
+2. 验证控制栏位于视频底部，半透明效果
+3. 点击视频区域，验证控制栏显示/隐藏切换
+4. 点击播放/暂停按钮，验证功能正常
+5. 拖动进度条，验证功能正常
+6. 等待3秒，验证控制栏自动隐藏

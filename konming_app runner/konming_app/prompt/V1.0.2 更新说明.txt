@@ -1,0 +1,62 @@
+# V1.0.2 更新说明
+
+## 更新类型
+功能拓展（第二级版本号升级）
+
+## 更新内容
+
+### 1. 添加播放设置按钮和倍速播放功能
+
+**修改文件：**
+- `app/src/main/res/layout/activity_fullscreen_video.xml`
+- `app/src/main/java/com/example/konming_app/ui/home/FullscreenVideoActivity.kt`
+
+**功能特性：**
+- 控制栏右侧新增设置按钮
+- 点击设置按钮弹出倍速选择菜单
+- 支持 0.5x、1.0x、1.5x、2.0x 四档倍速
+- 当前选中倍速显示为红色加粗
+- 倍速菜单弹出时暂停自动隐藏计时
+
+### 2. 拖动进度条时实时显示时间
+
+**修改文件：**
+- `app/src/main/java/com/example/konming_app/ui/home/FullscreenVideoActivity.kt`
+
+**功能特性：**
+- 拖动进度条过程中实时更新当前时间显示
+- 松开进度条后才执行跳转到对应位置
+
+### 3. 视频横竖屏分类逻辑
+
+**修改文件：**
+- `app/src/main/java/com/example/konming_app/data/model/Content.kt`
+- `app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+- `app/src/main/java/com/example/konming_app/ui/home/FullscreenVideoActivity.kt`
+
+**功能特性：**
+- Content 数据类新增 `isLandscape` 字段（默认 true）
+- 横屏视频（isLandscape=true）进入全屏时默认使用横屏播放
+- 竖屏视频（isLandscape=false）进入全屏时默认使用竖屏播放
+- 用户可随时手动切换横竖屏
+
+## 修改文件清单
+
+| 文件路径 | 修改类型 |
+| :--- | :--- |
+| `data/model/Content.kt` | 添加字段 |
+| `ui/home/ContentDetailActivity.kt` | 添加横竖屏参数传递 |
+| `ui/home/FullscreenVideoActivity.kt` | 新增倍速、时间显示、横竖屏逻辑 |
+| `res/layout/activity_fullscreen_video.xml` | 添加设置按钮和倍速弹窗 |
+
+## 验证步骤
+
+1. 进入推荐页，选择视频内容
+2. 点击全屏按钮进入全屏播放
+3. 验证设置按钮和倍速菜单功能正常
+4. 拖动进度条验证实时时间显示
+5. 验证横竖屏分类逻辑（需先上传不同方向的测试视频）
+
+---
+
+*版本号说明：第二级版本号升级表示模块级/页面级全面升级*

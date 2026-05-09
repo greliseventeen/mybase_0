@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.konming_app.ui.home.HomeFragment"
+        android:label="推荐页面" />
+    <fragment
+        android:id="@+id/agentFragment"
+        android:name="com.example.konming_app.ui.agent.AgentFragment"
+        android:label="智能体页面" />
+    <fragment
+        android:id="@+id/publishFragment"
+        android:name="com.example.konming_app.ui.home.HomeFragment"
+        android:label="发布页面" />
+    <fragment
+        android:id="@+id/communityFragment"
+        android:name="com.example.konming_app.ui.community.CommunityFragment"
+        android:label="社区页面" />
+    <fragment
+        android:id="@+id/mineFragment"
+        android:name="com.example.konming_app.ui.mine.MineFragment"
+        android:label="我的页面" />
+</navigation>

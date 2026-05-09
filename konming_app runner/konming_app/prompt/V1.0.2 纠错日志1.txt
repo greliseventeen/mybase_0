@@ -1,0 +1,53 @@
+# V1.0.2 纠错日志1
+
+## 问题描述
+全屏播放返回结果处理中，直接使用 `data?.getLongExtra()` 和 `data?.getBooleanExtra()`，但未检查 `data` 是否为 null。
+
+## 问题位置
+`app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt#L35-45`
+
+## 问题分析
+虽然原代码使用了 `?.` 安全调用，但当 `result.data` 为 null 时仍然会继续执行后续代码（使用默认值）。正确的做法是在处理前先检查 `result.data` 是否为 null。
+
+## 修复方案
+
+### 原代码
+```kotlin
+private val fullscreenLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+        val data = result.data
+        val position = data?.getLongExtra(FullscreenVideoActivity.EXTRA_PLAYBACK_POSITION, 0L) ?: 0L
+        val playWhenReady = data?.getBooleanExtra(FullscreenVideoActivity.EXTRA_PLAY_WHEN_READY, false) ?: false
+        exoPlayer?.seekTo(position)
+        if (playWhenReady) {
+            exoPlayer?.play()
+        }
+    }
+}
+```
+
+### 修复后代码
+```kotlin
+private val fullscreenLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+        val data = result.data!!
+        val position = data.getLongExtra(FullscreenVideoActivity.EXTRA_PLAYBACK_POSITION, 0L)
+        val playWhenReady = data.getBooleanExtra(FullscreenVideoActivity.EXTRA_PLAY_WHEN_READY, false)
+        exoPlayer?.seekTo(position)
+        if (playWhenReady) {
+            exoPlayer?.play()
+        }
+    }
+}
+```
+
+## 修改内容
+1. 在条件判断中增加 `result.data != null` 检查
+2. 确认不为 null 后使用 `!!` 安全转换
+3. 移除 `?.` 安全调用和 `?:` 空值合并
+
+## 修改文件
+`app/src/main/java/com/example/konming_app/ui/home/ContentDetailActivity.kt`
+
+## 验证步骤
+清理并重新构建项目，确认无编译警告
